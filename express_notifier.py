@@ -24,8 +24,11 @@ def get_tracking_info(order_no):
         res = requests.get(url, params=params, timeout=10)
         res.encoding = "utf-8"
         data = res.json()
-        if data.get("code") == 200:
-            obj = data.get("obj", {})
+        obj = data.get("obj", {})
+        
+        # 修改判断逻辑：
+        if data.get("flag") and obj and obj.get("orderNo"):
+            # 构建 HTML 内容
             info = f"""
             <div style='border:1px solid #ccc;border-radius:8px;padding:12px;margin-bottom:16px;'>
                 <h3>📦 单号：{obj.get('orderNo')}</h3>
@@ -38,7 +41,7 @@ def get_tracking_info(order_no):
             """
             return info
         else:
-            return f"<p style='color:red;'>❗ 单号 {order_no} 查询失败：{data.get('msg')}</p>"
+            return f"<p style='color:red;'>❗ 单号 {order_no} 查询失败：{data.get('msg') or '无返回信息'}</p>"
     except Exception as e:
         return f"<p style='color:red;'>⚠️ 查询 {order_no} 出错：{str(e)}</p>"
 
