@@ -1,0 +1,31 @@
+name: Daily Express Notify
+
+on:
+  schedule:
+    - cron: "0 0 * * *"     # UTC 00:00 -> 北京时间08:00
+    - cron: "0 10 * * *"    # UTC 10:00 -> 北京时间18:00
+  workflow_dispatch:
+
+jobs:
+  run-script:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Repo
+      uses: actions/checkout@v3
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: "3.x"
+
+    - name: Install Dependencies
+      run: pip install requests
+
+    - name: Run Script
+      env:
+        SENDER_EMAIL: ${{ secrets.SENDER_EMAIL }}
+        EMAIL_AUTH_CODE: ${{ secrets.EMAIL_AUTH_CODE }}
+        RECEIVER_EMAIL: ${{ secrets.RECEIVER_EMAIL }}
+        TRACKING_NUMBERS: ${{ secrets.TRACKING_NUMBERS }}
+      run: python express_notifier.py
